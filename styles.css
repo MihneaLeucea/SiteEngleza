@@ -78,6 +78,9 @@ aside{
     position: fixed;
     background: var(--LightGreen);
     font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 aside a{
@@ -89,9 +92,40 @@ aside a{
     margin-top: 30px;
 }
 
+a{
+    text-decoration: none;
+}
+
 a img{
     scale: 50%;
 }
+
+.home, .book, .pencil{
+    font-size: 100px;
+}
+
+a p{
+    font-family: 'Caudex', serif;
+}
+
+.icon-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px 0;
+    color: white;
+    text-decoration: none;
+    font-family: 'Georgia', serif; /* For that elegant serif look */
+  }
+  
+  .hover-text {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+  
+  .icon-link:hover .hover-text {
+    opacity: 1;
+  }
 
 #welcomeText{
     font-size: 50px;
