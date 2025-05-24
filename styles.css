@@ -178,28 +178,28 @@ a p{
 }
 
 #quiz-container {
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.6);
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       width: 100%;
-      max-width: 600px;
+      max-width: 800px;
       padding: 30px;
     }
     #quiz-header {
       margin-bottom: 20px;
     }
     #question-number {
-      font-size: 14px;
+      font-size: 22px;
       color: #666;
     }
     #question-text {
-      font-size: 20px;
+      font-size: 28px;
       margin: 10px 0 20px;
     }
     .option {
       display: block;
       margin-bottom: 10px;
-      font-size: 18px;
+      font-size: 26px;
     }
     .option input {
       margin-right: 10px;
@@ -209,17 +209,17 @@ a p{
       color: white;
       border: none;
       padding: 12px 20px;
-      font-size: 16px;
+      font-size: 24px;
       border-radius: 4px;
       cursor: pointer;
-      margin-top: 20px;
+      margin-top: 24px;
     }
     #action-btn:disabled {
       background: #ccc;
       cursor: default;
     }
     #result {
-      font-size: 24px;
+      font-size: 32px;
       text-align: center;
       margin-top: 30px;
     }
