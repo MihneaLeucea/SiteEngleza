@@ -33,12 +33,22 @@
 
             <main class="image">
                 <div class="image-container">
-                    <p id="welcomeText">Hail and well met!<br> The purpose of this fair site is to lend aid in the teaching of the English tongue unto scholars of high-school degree. Herein shall students acquaint themselves with words of medieval ilk through exercises both lively and interactive. This humble undertaking was wrought by Dorgo Andrei and Leucea Mihnea of the National College “Mihai Eminescu,” Oradea.</p> 
+                    <div id="quiz-container">
+    <div id="quiz-header">
+      <div id="question-number"></div>
+      <div id="question-text"></div>
+    </div>
+    <form id="quiz-form">
+      <!-- options will be injected here -->
+    </form>
+    <button id="action-btn" disabled>Next</button>
+    <div id="result"></div>
+  </div>
                 </div>
             </main>
         </div>
         
-
+        <script src="script.js"></script>
         
     </body>
 </html>

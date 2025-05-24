@@ -70,6 +70,7 @@ header a{
     justify-content: center;
     color: white;
     font-size: 32px;
+    overflow: scroll;
 }
 
 aside{
@@ -175,3 +176,50 @@ a p{
 .tooltip:hover::after {
   opacity: 1;
 }
+
+#quiz-container {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 600px;
+      padding: 30px;
+    }
+    #quiz-header {
+      margin-bottom: 20px;
+    }
+    #question-number {
+      font-size: 14px;
+      color: #666;
+    }
+    #question-text {
+      font-size: 20px;
+      margin: 10px 0 20px;
+    }
+    .option {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .option input {
+      margin-right: 10px;
+    }
+    #action-btn {
+      background: #006400;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #action-btn:disabled {
+      background: #ccc;
+      cursor: default;
+    }
+    #result {
+      font-size: 24px;
+      text-align: center;
+      margin-top: 30px;
+    }
