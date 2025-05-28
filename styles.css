@@ -223,3 +223,44 @@ a p{
       text-align: center;
       margin-top: 30px;
     }
+
+.header-btn {
+  position: absolute;           /* position relative to <header> */
+  top: 50%;                     /* vertically center */
+  right: 30px;                  /* same horizontal padding as your header text */
+  transform: translateY(-50%);  /* perfect vertical centering */
+  
+  /* visual styling—you can tweak colors, padding, etc. */
+  background-color: var(--OffWhite);
+  color: var(--DarkGreen);
+  padding: 8px 16px;
+  font-size: 24px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-family: 'Caudex', serif;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.header-btn:hover {
+  background-color: var(--LightGreen);
+  color: var(--OffWhite);
+}
+
+#page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--DarkGreen); /* or black or any other color */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 9999;
+}
+
+#page-transition-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
