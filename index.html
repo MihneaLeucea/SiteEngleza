@@ -1,47 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <script src="https://kit.fontawesome.com/dd3245b83d.js" crossorigin="anonymous"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Vocabulary of the Ages</title>
-        <link rel="stylesheet" href="styles.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://kit.fontawesome.com/dd3245b83d.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary of the Ages</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #easyWelcomeText {
+            display: none; /* Start with this one hidden */
+        }
+        .header-btn {
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
 
-    <body>
-        <header>
-            Vocabulary of the Ages
+<body>
+    <header>
+        Vocabulary of the Ages
+        <a id="toggleBtn" class="header-btn">Translate to normal English</a>
+    </header>
 
-           
-    <a href="anotherPage.html" class="header-btn">Translate to normal english</a>
-        </header>
+    <div class="page-container">
+        <aside>
+            <a class="icon-link" href="index.html">
+                <i class="fas fa-home home"></i>
+                <p class="hover-text">Home</p>
+            </a><br>
 
-        <div class="page-container">
-            <aside>
-                <a class="icon-link" href="index.html">
-                    <i class="fas fa-home home"></i>
-                    <p class="hover-text">Home</p>
-                </a><br>
+            <a class="icon-link" href="lesson.html">
+                <i class="fa-solid fa-book book "></i>
+                <p class="hover-text">Book</p>
+            </a><br>
 
-                <a class="icon-link" href="lesson.html">
-                    <i class="fa-solid fa-book book "></i>
-                    <p class="hover-text">Book</p>
-                 </a><br>
+            <a class="icon-link" href="lessonQuiz.html">
+                <i class="fa-solid fa-pencil pencil"></i>
+                <p class="hover-text">Pencil</p>
+            </a><br>
 
-                 <a class="icon-link" href="lessonQuiz.html">
-                    <i class="fa-solid fa-pencil pencil"></i>
-                    <p class="hover-text">Pencil</p>
-                 </a><br>
-            </aside>
+            <a class="icon-link" href="pairs.html">
+                <i class="fa-solid fa-images pairs"></i>
+                <p class="hover-text">Pairs</p>
+            </a><br>
+        </aside>
 
-            <main class="image">
-                <div class="image-container">
-                    <p id="welcomeText">Hail and well met!<br> The purpose of this fair site is to lend aid in the teaching of the English tongue unto scholars of high-school degree. Herein shall students acquaint themselves with words of medieval ilk through exercises both lively and interactive. This humble undertaking was wrought by Dorgo Andrei and Leucea Mihnea of the National College “Mihai Eminescu,” Oradea.</p> 
-                </div>
-            </main>
-        </div>
-        
+        <main class="image">
+            <div class="image-container">
+                <p id="welcomeText">
+                    Hail and well met!<br> The purpose of this fair site is to lend aid in the teaching of the English tongue unto scholars of high-school degree. Herein shall students acquaint themselves with words of medieval ilk through exercises both lively and interactive. This humble undertaking was wrought by Dorgo Andrei and Leucea Mihnea of the National College “Mihai Eminescu,” Oradea.
+                </p>
+                <p id="easyWelcomeText">
+                    Greetings and welcome!<br> This website is designed to support high school students in learning the English language. Here, learners will explore medieval-style vocabulary through engaging and interactive exercises. This project was created by Dorgo Andrei and Leucea Mihnea from the “Mihai Eminescu” National College in Oradea.
+                </p>
+            </div>
+        </main>
+    </div>
 
-        
-    </body>
+    <script>
+        const toggleBtn = document.getElementById("toggleBtn");
+        const welcomeText = document.getElementById("welcomeText");
+        const easyWelcomeText = document.getElementById("easyWelcomeText");
+
+        toggleBtn.addEventListener("click", () => {
+            const isMedievalVisible = welcomeText.style.display !== "none";
+
+            welcomeText.style.display = isMedievalVisible ? "none" : "block";
+            easyWelcomeText.style.display = isMedievalVisible ? "block" : "none";
+
+            toggleBtn.textContent = isMedievalVisible
+                ? "Translate to medieval English"
+                : "Translate to normal English";
+        });
+    </script>
+</body>
 </html>

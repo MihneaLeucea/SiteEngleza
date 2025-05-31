@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- ===================================================================
+       Replace the placeholder below with your desired game title
+       (e.g., "Match the Fruits")
+     =================================================================== -->
+  <title>Match the pairs</title>
+
+  <style>
+    /* ===================================================================
+       GENERAL RESET & BASE STYLING
+       =================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: quicksand, sans-serif;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 8px;
+      color: #F0E3C7;
+      font-size: 3rem;
+      text-align: center;
+    }
+    p.instructions {
+      margin-bottom: 20px;
+      color: #F0E3C7;
+      font-size: 25px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    /* ===================================================================
+       CURRENT WORD CONTAINER (ONE WORD DRAGGABLE)
+       =================================================================== */
+    .current-word-container {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #current-word-card {
+      font-family: quicksand, sans-serif;
+      font-weight: bold;
+      display: inline-block;
+      background-color: #45752a;
+      color: #F0E3C7;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.2rem;
+      cursor: grab;
+      user-select: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    #current-word-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+    #current-word-card.hidden {
+      visibility: hidden;
+    }
+
+    /* ===================================================================
+       IMAGES GRID (DROP ZONES)
+       =================================================================== */
+    .images-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      max-width: 1000px;
+      width: 100%;
+    }
+    .image-card {
+      position: relative;
+      /* Four columns: subtract three 20px gaps from 100%, then divide by 4 */
+      width: calc((100% - 60px) / 4);
+      background-color: #fff;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      transition: border-color 0.3s ease;
+      min-width: 150px;
+      max-width: 250px;
+      aspect-ratio: 1 / 1; /* keep a square shape */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .image-card img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      pointer-events: none; /* prevent dragging the image itself */
+      border-radius: 4px;
+    }
+    .image-card .drop-hint {
+      position: absolute;
+      bottom: 8px;
+      font-size: 0.9rem;
+      color: #aaa;
+      pointer-events: none;
+    }
+    .image-card.correct {
+      border-color: #4caf50; /* green */
+    }
+    .image-card.incorrect {
+      border-color: #f44336; /* red */
+      animation: shake 0.3s ease-in-out;
+    }
+    .matched-word {
+      margin-top: 8px;
+      font-weight: bold;
+      color: #4caf50;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* ===================================================================
+       RESPONSIVE BREAKPOINTS
+       on medium screens (≤900px): two columns
+       on small screens (≤600px): one column
+       =================================================================== */
+    @media screen and (max-width: 900px) {
+      .image-card {
+        width: calc((100% - 20px) / 2); /* two columns: subtract one 20px gap, then divide by 2 */
+      }
+    }
+    @media screen and (max-width: 600px) {
+      .image-card {
+        width: 100%; /* one column on small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Game Title -->
+  <h1>Match the pairs</h1>
+  <!-- ===================================================================
+       Brief instructions (replace the placeholder below)
+       e.g., "Drag the word above onto the correct picture below."
+     =================================================================== -->
+  <p class="instructions">
+    Match the given word with the correct image below. Drag the word onto the image that represents it.
+  </p>
+
+  <!-- ===================================================================
+       CURRENT WORD (ONLY ONE) – draggable
+     =================================================================== -->
+  <div class="current-word-container">
+    <div id="current-word-card" draggable="true">
+      <!-- The JavaScript will inject the first word here -->
+      WORD_PLACEHOLDER
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       IMAGES GRID: each image is a drop zone
+     =================================================================== -->
+  <div class="images-grid" id="images-grid">
+    <!-- JavaScript will generate .image-card elements here -->
+  </div>
+
+  <!-- ===================================================================
+       JAVASCRIPT: Game Logic
+     =================================================================== -->
+  <script>
+    // 1) CONFIGURATION: replace the placeholders below with your data
+    // ==============================================================
+
+    // a) Game Title (used in <title> and <h1>)
+    const gameTitle = "Match the pairs";
+
+    // b) Comma-separated list of words (each word will appear one at a time)
+    //    Example: "Apple,Banana,Cherry,Dates"
+    const wordsString = "manor, wheelbarrow, flail, hoe, pitchfork, priest, mill, blacksmith";
+
+    // c) Comma-separated list of image URLs (must match number/order of words)
+    const imageUrlsString = 
+      "https://static0.hardcoregamerimages.com/wordpress/wp-content/uploads/2024/11/witcher-3-corvo-bianco-geralt-s-house.jpg, \
+      https://p.turbosquid.com/ts-thumb/su/7GSq89/gDCwqsXS/wheelbarrow_02/jpg/1485006810/1920x1080/fit_q87/ecead14c7b709347233a4d503e40202678195652/wheelbarrow_02.jpg, \
+      https://www.theknightshop.com/media/catalog/product/cache/1/image/650x/c9dcfd7b7989a8e877246fb8f9b6b76e/2/7/27-1.01_1.jpg, \
+      https://static.wikia.nocookie.net/minecraft_gamepedia/images/0/04/Diamond_Hoe_JE3_BE3.png/revision/latest/scale-to-width/360?cb=20200226193929, \
+      https://png.pngtree.com/png-clipart/20221224/original/pngtree-middle-ages-pitchfork-sm70s-png-image_8802971.png, \
+      https://i0.wp.com/about-history.com/wp-content/uploads/2017/07/Medieval_Priest_Friar_or_Monk_1.jpg?resize=700%2C700, \
+      https://www.medievalchronicles.com/wp-content/uploads/2022/05/mill-ga70afcdcb_640.webp, \
+      https://i.ytimg.com/vi/Wg7XIrHU_RY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLACsa7WMqte6p52D4eNa2xHX2raag";
+
+    // d) (Optional) If your “matching key” differs from the visible word text,
+    //    you can supply a third comma-separated list of keys here. Otherwise,
+    //    we’ll match by the exact word text.
+    // const matchKeysString = "manor,wheelbarrow,flail,hoe,pitchfork,priest,mill,blacksmith";
+
+    // ==============================================================
+
+    // 2) PARSE & VALIDATE INPUTS
+    // ==============================================================
+
+    const wordsArray = wordsString
+      .split(",")
+      .map(w => w.trim())
+      .filter(w => w.length > 0);
+
+    const imageUrlsArray = imageUrlsString
+      .split(",")
+      .map(u => u.trim())
+      .filter(u => u.length > 0);
+
+    if (wordsArray.length !== imageUrlsArray.length) {
+      alert("⚠️ Configuration Error: The number of words and image URLs must match exactly.");
+      throw new Error("Mismatch between words count and image URLs count.");
+    }
+
+    // Use exact word text as match keys (unless you want a separate list)
+    const matchKeysArray = wordsArray.slice();
+
+    // ==============================================================
+
+    // 3) SHUFFLE THE ORDER OF WORDS (Fisher–Yates)
+    // ==============================================================
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Combine word text & matchKey into one object
+    const wordObjects = wordsArray.map((text, idx) => ({
+      text,
+      matchKey: matchKeysArray[idx]
+    }));
+    shuffleArray(wordObjects);
+
+    // ==============================================================
+
+    // 4) VARIABLES TO TRACK GAME STATE
+    // ==============================================================
+
+    let currentIndex = 0; // Which word in wordObjects[] is “current”
+    const totalItems = wordObjects.length;
+
+    // DOM references:
+    const currentWordCard = document.getElementById("current-word-card");
+    const imagesGrid = document.getElementById("images-grid");
+
+    // ==============================================================
+
+    // 5) INITIAL SETUP: Display first word & build image drop zones
+    // ==============================================================
+
+    // (a) Set document title and <h1> text
+    document.title = gameTitle;
+    document.querySelector("h1").textContent = gameTitle;
+
+    // (b) Function to render the “current word” in the draggable card
+    function renderCurrentWord() {
+      if (currentIndex < totalItems) {
+        const { text, matchKey } = wordObjects[currentIndex];
+        currentWordCard.textContent = text;
+        currentWordCard.dataset.matchKey = matchKey;
+        currentWordCard.classList.remove("hidden");
+        currentWordCard.setAttribute("draggable", "true");
+      } else {
+        // All words matched: hide current-word and show a “congrats” after a brief delay
+        currentWordCard.classList.add("hidden");
+        setTimeout(() => {
+          alert("🎉 Congratulations! You matched all items correctly.");
+        }, 200);
+      }
+    }
+
+    // (c) Build the .image-card elements and attach drag/drop handlers
+    imageUrlsArray.forEach((url, idx) => {
+      const matchKey = matchKeysArray[idx];
+
+      // Create a wrapper div
+      const imgCard = document.createElement("div");
+      imgCard.classList.add("image-card");
+      imgCard.dataset.matchKey = matchKey;
+      imgCard.id = `image-card-${idx}`;
+
+      // Insert the <img> element
+      const imgElem = document.createElement("img");
+      imgElem.src = url;
+      imgElem.alt = "Match‐zone image";
+      imgElem.draggable = false; // Prevent the image itself from being dragged
+
+      // Hint text (e.g. “Drop here”)
+      const dropHint = document.createElement("div");
+      dropHint.classList.add("drop-hint");
+      dropHint.textContent = "Drop here";
+
+      // Placeholder for showing the matched word text
+      const matchedWordElem = document.createElement("div");
+      matchedWordElem.classList.add("matched-word");
+      matchedWordElem.id = `matched-word-${idx}`;
+
+      // Assemble
+      imgCard.appendChild(imgElem);
+      imgCard.appendChild(dropHint);
+      imgCard.appendChild(matchedWordElem);
+      imagesGrid.appendChild(imgCard);
+
+      // Attach drag/drop event listeners
+      imgCard.addEventListener("dragover", handleDragOver);
+      imgCard.addEventListener("dragenter", handleDragEnter);
+      imgCard.addEventListener("dragleave", handleDragLeave);
+      imgCard.addEventListener("drop", handleDrop);
+    });
+
+    // Finally, show the very first word
+    renderCurrentWord();
+
+    // ==============================================================
+
+    // 6) DRAG & DROP EVENT HANDLERS
+    // ==============================================================
+
+    let draggedItem = null;
+
+    // (a) When the “current word” drag starts
+    function handleDragStart(e) {
+      draggedItem = e.target; // Should be currentWordCard
+      e.dataTransfer.setData("text/plain", e.target.dataset.matchKey);
+      e.dataTransfer.effectAllowed = "move";
+
+      // Add a class so it visually dims during drag
+      setTimeout(() => {
+        e.target.classList.add("dragging");
+      }, 0);
+    }
+
+    // (b) When drag ends (either dropped or cancelled)
+    function handleDragEnd(e) {
+      e.target.classList.remove("dragging");
+      draggedItem = null;
+    }
+
+    // (c) While dragging over an image, allow drop
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    }
+
+    // (d) When the dragged item enters an image’s area
+    function handleDragEnter(e) {
+      e.preventDefault();
+      const zone = e.currentTarget;
+      if (!zone.classList.contains("correct")) {
+        zone.classList.add("drag-over");
+      }
+    }
+
+    // (e) When the dragged item leaves an image’s area
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove("drag-over");
+    }
+
+    // (f) When the word is dropped onto an image
+    function handleDrop(e) {
+      e.preventDefault();
+      const dropZone = e.currentTarget; // the .image-card div
+      dropZone.classList.remove("drag-over");
+
+      // If already matched, do nothing
+      if (dropZone.classList.contains("correct")) return;
+
+      // Compare keys
+      const droppedKey = e.dataTransfer.getData("text/plain");
+      const zoneKey = dropZone.dataset.matchKey;
+
+      if (droppedKey === zoneKey) {
+        // === CORRECT MATCH ===
+        dropZone.classList.add("correct");
+        dropZone.classList.remove("incorrect");
+        dropZone.querySelector(".drop-hint").style.display = "none";
+
+        // Show the matched word below the image
+        const matchedWordElem = dropZone.querySelector(".matched-word");
+        matchedWordElem.textContent = draggedItem.textContent;
+
+        // “Consume” the current word (hide it immediately)
+        currentWordCard.classList.add("hidden");
+        currentWordCard.setAttribute("draggable", "false");
+
+        // Move on to the next word after a short delay
+        currentIndex++;
+        setTimeout(() => {
+          renderCurrentWord();
+        }, 300);
+
+      } else {
+        // === INCORRECT MATCH ===
+        dropZone.classList.add("incorrect");
+        // Remove the red border/shake after 0.5s
+        setTimeout(() => {
+          dropZone.classList.remove("incorrect");
+        }, 500);
+      }
+    }
+
+    // ==============================================================
+
+    // 7) ATTACH DRAG LISTENERS TO THE “CURRENT WORD” CARD
+    // ==============================================================
+
+    currentWordCard.addEventListener("dragstart", handleDragStart);
+    currentWordCard.addEventListener("dragend", handleDragEnd);
+
+    // ==============================================================
+
+    // 8) OPTIONAL: In case you want to allow “click-to-drop” on mobile
+    //    (Some mobile browsers do not fully support native drag/drop.)
+    //    Uncomment the following block if you want a tap-to-select/tap-to-drop fallback.
+    // ==============================================================
+
+    /*
+    let selectedWordKey = null;
+
+    // When user taps the current word, mark it as “selected”:
+    currentWordCard.addEventListener("click", function() {
+      if (currentIndex >= totalItems) return;
+      selectedWordKey = currentWordCard.dataset.matchKey;
+      currentWordCard.classList.add("dragging"); // reuse the same visual cue
+    });
+
+    // When user taps an image, try to match if a word is selected:
+    document.querySelectorAll(".image-card").forEach(zone => {
+      zone.addEventListener("click", function() {
+        if (!selectedWordKey || zone.classList.contains("correct")) return;
+        const zoneKey = zone.dataset.matchKey;
+        if (selectedWordKey === zoneKey) {
+          // Same “correct” logic as drop:
+          zone.classList.add("correct");
+          zone.querySelector(".drop-hint").style.display = "none";
+          zone.querySelector(".matched-word").textContent = currentWordCard.textContent;
+          currentWordCard.classList.add("hidden");
+          currentWordCard.setAttribute("draggable", "false");
+          selectedWordKey = null;
+          currentIndex++;
+          setTimeout(() => renderCurrentWord(), 300);
+        } else {
+          zone.classList.add("incorrect");
+          setTimeout(() => {
+            zone.classList.remove("incorrect");
+          }, 500);
+          // Deselect the word
+          selectedWordKey = null;
+          currentWordCard.classList.remove("dragging");
+        }
+      });
+    });
+    */
+
+  </script>
+</body>
+</html>
